@@ -21,14 +21,21 @@ class Score{ //Object to represent score for a single user
         this.score = score;
         this.numOfGames = numgames;
         this.averageScore = averagescore;
+        this.wantsToReset = false;
     }
     addscore(toadd){ //adding to score and recalculating average
         this.score += toadd;
         this.numOfGames++;
         this.averageScore = parseFloat((this.score) / this.numOfGames).toFixed(2);
+        this.wantsToReset = false;
     }
     resetscore(){ //does what it says on the tin
+        if(this.wantsToReset){
         this.score = 0;
+        this.averageScore = 0;
+        this.numOfGames = 0;
+        this.wantsToReset = false;
+        }
     }
 }
 
@@ -162,6 +169,33 @@ function scoresHandler(MsgArgs,event){ //handles chat commands
                 scoreboards[TheBoard].queryScore(event);
             }
         }
+    } else if(MsgArgs[1] == "help"){ //help
+        rtm.sendMessage(`
+        SCORDERBOT: SCORE TRACKER FOR SCOREDERBOT.
+        \`@scorederbot\` will print a top 10 scoreboard for the channel.
+        \`@scorederbot me\` will show your own score for this channel.
+        \`@scorederbot resetme\` will reset your own score to zero.
+        `, event.channel);
+
+    } else if(MsgArgs[1] == "resetme"){ //resetting with confirmation
+        if(TheBoard == -1){
+            rtm.sendMessage("Could not find any scores for this channel.",event.channel);
+        } else{
+        theUserPos = scoreboards[TheBoard].getUserPos(event.user);
+        if(theUserPos == -1){
+            rtm.sendMessage("I can't find you in this channel's scoreboard.", event.channel);
+        } else if(!scoreboards[TheBoard].scores[theUserPos].wantsToReset){
+            rtm.sendMessage("If you are sure you want to reset your score for this channel, type `@scorederbot resetme` once again. This will expire the next time you score points.",event.channel);
+            scoreboards[TheBoard].scores[theUserPos].wantsToReset = true;
+        } else {
+            scoreboards[TheBoard].scores[theUserPos].resetscore();
+            rtm.sendMessage("<@" + event.user + ">, your score has been reset.", event.channel);
+            scoreboards[TheBoard].refreshLeaderboard();
+        }
+
+
+        }
+
     }
 }
 
