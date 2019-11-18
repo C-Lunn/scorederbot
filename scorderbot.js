@@ -106,7 +106,14 @@ function GetUserList(){ //gets the full list of all users on the workspace. Only
 
 function GetUserNameFromList(InID){ //returns the user name from the users list when supplied with UID. -1 if not.
     for(var q = 0; q < theUserList.length; q++){
-        if(InID == theUserList[q].id) return theUserList[q].profile.display_name;
+        if(InID == theUserList[q].id){
+            if(theUserList[q].profile.display_name == ""){
+                return theUserList[q].name;
+            }
+            else{
+            return theUserList[q].profile.display_name;
+            }
+        }
     }
     return -1;
 }
@@ -240,7 +247,10 @@ rtm.on('message', (event) => { //this is a callback that occurs on every message
         }
     }
         MsgArgs = parseMessage(event.text); //get the message args as an array
-        if(MsgArgs[0] == "<".concat(BotID.toLowerCase(),">")){  //if first arg of message is @scorederbot then start doing stuff
+    if(MsgArgs.length > 1 && MsgArgs[1] == "msgme"){
+        rtm.sendMessage("blah", "DQKRCEC76");
+    }
+    if(MsgArgs[0] == "<".concat(BotID.toLowerCase(),">")){  //if first arg of message is @scorederbot then start doing stuff
                 scoresHandler(MsgArgs,event);
             }
 
@@ -261,5 +271,4 @@ function parseMessage(inputString){ //return each word in a message as an entry 
     retArray[ArrayPos]=inputString //put remainder of message into last entry of array
     return retArray;
 }
-
 
