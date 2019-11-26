@@ -6,10 +6,10 @@
 //Set up RTM api, proxy, and file system reader
 const { RTMClient, CLIENT_EVENTS, RTM_EVENTS } = require('@slack/rtm-api');
 const token = process.env.VORDERTOKEN; //ScoreToken is an environment variable set with the token in (so it's not published to github)
-//const HttpsProxyAgent = require('https-proxy-agent');
-//const proxyUrl = process.env.http_proxy //likewise for the proxy
+const HttpsProxyAgent = require('https-proxy-agent');
+const proxyUrl = process.env.http_proxy //likewise for the proxy
 var fs = require("fs");
-const rtm = new RTMClient(token); //creates a new RTM bot
+const rtm = new RTMClient(token, {agent: new HttpsProxyAgent(proxyUrl)}); //creates a new RTM bot
 scoreboards = [];
 theUserList = [];
 listAccessCount = 0;
